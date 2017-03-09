@@ -17,6 +17,7 @@
 
 
 <ion-content padding>
+  <ion-searchbar (input)="search($event)"></ion-searchbar>
   <ion-list>
     <button ion-item *ngFor="let user of users">
       <ion-avatar item-left>

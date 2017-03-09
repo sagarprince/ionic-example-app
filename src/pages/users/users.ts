@@ -18,6 +18,7 @@ import { GithubUsers } from  '../../providers/github-users';
 export class UsersPage {
 
   users: User[];
+  originalUsers: User[];
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private githubUsers: GithubUsers, public loading: LoadingController) {
     let loader = this.loading.create({
@@ -27,6 +28,7 @@ export class UsersPage {
     loader.present();
     githubUsers.load().subscribe(users => {
       this.users = users;
+      this.originalUsers = users;
       console.log(this.users);
       loader.dismiss();
     });
@@ -35,6 +37,24 @@ export class UsersPage {
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad UsersPage');
+  }
+
+  search(searchEvent) {
+    let searchTerm = searchEvent.target.value;    
+    searchTerm = searchTerm.trim().toLowerCase();
+
+    if (searchTerm !== '' && searchTerm.length > 2) {
+      this.users = this.users.filter((v) => {        
+        let login = v.login.toLowerCase();
+        if (login.indexOf(searchTerm) > -1) {
+          return true;
+        }
+
+        return false;
+      });
+    } else {
+      this.users = this.originalUsers;
+    }
   }
 
 }
