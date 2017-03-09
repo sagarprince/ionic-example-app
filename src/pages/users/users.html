@@ -13,11 +13,12 @@
       Users
     </ion-title>
   </ion-navbar>
+  <ion-toolbar>
+    <ion-searchbar (input)="search($event)"></ion-searchbar>
+  </ion-toolbar>
 </ion-header>
 
-
-<ion-content padding>
-  <ion-searchbar (input)="search($event)"></ion-searchbar>
+<ion-content padding>    
   <ion-list>
     <button ion-item *ngFor="let user of users">
       <ion-avatar item-left>
