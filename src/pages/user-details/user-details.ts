@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, LoadingController } from 'ionic-angular';
+
+import { User } from '../../models/user';
+import { GithubUsers } from '../../providers/github-users';
 
 /*
   Generated class for the UserDetails page.
@@ -14,9 +17,19 @@ import { NavController, NavParams } from 'ionic-angular';
 export class UserDetailsPage {
 
   login: string;
+  user: User;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public loading: LoadingController, private githubUsers: GithubUsers) {
     this.login = navParams.get('login');
+    let loader = this.loading.create({
+      content: 'Please wait...',
+      spinner: 'crescent'
+    });
+    loader.present();
+    githubUsers.loadDetails(this.login).subscribe(user => {
+      this.user = user;
+      loader.dismiss();
+    });
   }
 
   ionViewDidLoad() {
