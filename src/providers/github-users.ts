@@ -21,8 +21,9 @@ export class GithubUsers {
   }
 
   // Load all github users
-  load(): Observable<User[]> {
-    return this.http.get(this.githubApiUrl + '/users')
+  load(page: number): Observable<User[]> {
+    page = page || 0;
+    return this.http.get(this.githubApiUrl + '/users?since='+page)
     .map(res => <User[]>res.json());
   }
 

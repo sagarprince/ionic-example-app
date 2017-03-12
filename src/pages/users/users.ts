@@ -20,23 +20,63 @@ export class UsersPage {
 
   users: User[];
   originalUsers: User[];
+  showRefreshButton: Boolean;
+  pageNumber: number;
+  isNotSearching: Boolean;
 
   constructor(public navCtrl: NavController, 
   public navParams: NavParams, 
   private githubUsers: GithubUsers, 
   public loading: LoadingController,
   public alertCtrl: AlertController) {
-    let loader = this.showLoader();
-    githubUsers.load().subscribe(users => {
-      this.users = users;
-      this.originalUsers = users;
-      console.log(this.users);
-      loader.dismiss();
-    });    
+    this.fetchGitUsers();
+    this.isNotSearching = true;
+    this.pageNumber = 31;
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad UsersPage');
+  }
+
+  fetchGitUsers() {
+    let loader = this.showLoader();
+    this.githubUsers.load(0).subscribe(users => {
+      this.users = users;
+      this.originalUsers = users;
+      this.showRefreshButton = false;
+      loader.dismiss();
+    }, error => {
+      this.showRefreshButton = true;
+      this.showAlertMessage('Error', 'Something went wrong, please try again later');
+      loader.dismiss();
+    });
+  }
+
+  doRefreshGitUsers(refresher) {
+    this.githubUsers.load(0).subscribe(users => {
+      this.users = users;
+      this.originalUsers = users;
+      this.showRefreshButton = false;
+      refresher.complete();
+    }, error => {
+      this.showAlertMessage('Error', 'Something went wrong, please try again later');
+      refresher.complete();
+    });
+  }
+
+  paginateGitUsers(infiniteScroll) {
+    if (this.isNotSearching === true) {
+      this.githubUsers.load(this.pageNumber).subscribe(users => {
+        this.showRefreshButton = false;
+        Array.prototype.push.apply(this.users, users);
+        Array.prototype.push.apply(this.originalUsers, users);
+        infiniteScroll.complete();
+        this.pageNumber = this.pageNumber + 30;
+      }, error => {
+        this.showAlertMessage('Error', 'Something went wrong, please try again later');
+        infiniteScroll.complete();
+      });
+    }    
   }
 
   goToDetails(login: string) {
@@ -50,24 +90,26 @@ export class UsersPage {
     let searchTerm = searchEvent.target.value;    
     searchTerm = searchTerm.trim().toLowerCase();
 
-    if (searchTerm !== '' && searchTerm.length > 3) {
-      // this.users = this.users.filter((v) => {        
-      //   let login = v.login.toLowerCase();
-      //   if (login.indexOf(searchTerm) > -1) {
-      //     return true;
-      //   }
+    if (searchTerm !== '' && searchTerm.length > 1) {
+      this.isNotSearching = false;
+      this.users = this.users.filter((v) => {        
+        let login = v.login.toLowerCase();
+        if (login.indexOf(searchTerm) > -1) {
+          return true;
+        }
 
-      //   return false;
-      // });
-      let loader = this.showLoader();
-      this.githubUsers.searchUsers(searchTerm).subscribe(users => {
-        this.users = users;
-        loader.dismiss();
-      }, error => {
-        this.showAlertMessage('Error', 'Something went wrong, please try again later');
-        loader.dismiss();
+        return false;
       });
+      // let loader = this.showLoader();
+      // this.githubUsers.searchUsers(searchTerm).subscribe(users => {
+      //   this.users = users;
+      //   loader.dismiss();
+      // }, error => {
+      //   this.showAlertMessage('Error', 'Something went wrong, please try again later');
+      //   loader.dismiss();
+      // });
     } else {
+      this.isNotSearching = true;
       this.users = this.originalUsers;
     }
   }

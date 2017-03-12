@@ -11,13 +11,16 @@ import { GithubUsers } from  '../providers/github-users';
 
 import { UserDetailsPage } from '../pages/user-details/user-details';
 
+import { TabsPage } from '../pages/tabs/tabs';
+
 @NgModule({
   declarations: [
     MyApp,
     UsersPage,
     ReposPage,
     OrganisationsPage,
-    UserDetailsPage
+    UserDetailsPage,
+    TabsPage
   ],
   imports: [
     IonicModule.forRoot(MyApp)
@@ -28,7 +31,8 @@ import { UserDetailsPage } from '../pages/user-details/user-details';
     UsersPage,
     ReposPage,
     OrganisationsPage,
-    UserDetailsPage
+    UserDetailsPage,
+    TabsPage
   ],
   providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}, GithubUsers]
 })

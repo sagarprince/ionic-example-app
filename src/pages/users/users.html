@@ -19,6 +19,21 @@
 </ion-header>
 
 <ion-content padding>    
+
+  <button ion-button full icon-left *ngIf="showRefreshButton" (click)="fetchGitUsers()">
+    <ion-icon name="refresh"></ion-icon>
+    Get Git Users
+  </button>
+
+  <ion-refresher (ionRefresh)="doRefreshGitUsers($event)">
+    <ion-refresher-content
+      pullingIcon="arrow-dropdown"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Refreshing...">  
+    </ion-refresher-content>
+  </ion-refresher>
+
   <ion-list>
     <button ion-item *ngFor="let user of users" (click)="goToDetails(user.login)">
       <ion-avatar item-left>
@@ -27,5 +42,12 @@
       <h2>{{ user.login }}</h2>
       <ion-icon name="md-arrow-forward" item-right></ion-icon>
     </button>
-  </ion-list>  
+  </ion-list>
+
+  <ion-infinite-scroll (ionInfinite)="paginateGitUsers($event)">
+   <ion-infinite-scroll-content loadingSpinner="bubbles"
+      loadingText="Loading more users..." *ngIf="isNotSearching"></ion-infinite-scroll-content>
+ </ion-infinite-scroll>
 </ion-content>
+
+
